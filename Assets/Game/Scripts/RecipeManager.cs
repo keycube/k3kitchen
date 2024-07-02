@@ -6,68 +6,59 @@ using UnityEngine.UI;
 
 public class RecipeManager : MonoBehaviour
 {
+
+    public Recipe[] recipes;
+
     public Recipe currentRecipe;
     public TMP_Text displayText; // UI Text component to display the current word
-    public TMP_InputField inputField; // UI InputField component to receive player's input
+    public TMP_Text displayText2;
 
-    private int currentStepIndex;
+    public int currentStepIndex;
+
     private int currentWordIndex;
-    private bool isWordCompleted;
+
+    private bool hasActiveWord;
+    private Word activeWord;
 
     void Start()
     {
-        if (currentRecipe != null && displayText != null && inputField != null)
-        {
-            currentStepIndex = 0;
-            currentWordIndex = 0;
-            isWordCompleted = false;
-            inputField.onEndEdit.AddListener(OnWordEntered);
-            StartCoroutine(PlayRecipe());
-        }
+        currentRecipe = recipes[0];
+        currentStepIndex = 0;
+        currentWordIndex = 0;
+        hasActiveWord = false;
+        activeWord = null;
+            
+        displayText.text = currentRecipe.steps[currentStepIndex].words[currentWordIndex].word;
+        displayText2.text = currentRecipe.steps[currentStepIndex].words[currentWordIndex+1].word;
     }
 
-    IEnumerator PlayRecipe()
+    public void TypeLetter(char letter)
     {
-        while (currentStepIndex < currentRecipe.steps.Count)
+        if (hasActiveWord)
         {
-            Step currentStep = currentRecipe.steps[currentStepIndex];
-            while (currentWordIndex < currentStep.words.Count)
+            if (activeWord.GetNextLetter() == letter)
             {
-                string currentWord = currentStep.words[currentWordIndex];
-                displayText.text = currentWord;
-                isWordCompleted = false;
-
-                // Wait until the player completes the current word
-                while (!isWordCompleted)
-                {
-                    yield return null;
-                }
-
-                currentWordIndex++;
+                activeWord.TypeLetter();
             }
-            currentWordIndex = 0;
-            currentStepIndex++;
-        }
-
-        // Recipe completed
-        displayText.text = "Recipe completed!";
-    }
-
-    void OnWordEntered(string playerInput)
-    {
-        Step currentStep = currentRecipe.steps[currentStepIndex];
-        string currentWord = currentStep.words[currentWordIndex];
-
-        if (playerInput.Trim().Equals(currentWord, System.StringComparison.OrdinalIgnoreCase))
-        {
-            isWordCompleted = true;
-            inputField.text = string.Empty; // Clear input field for the next word
-            inputField.ActivateInputField(); // Keep the input field focused
         }
         else
         {
-            // Optionally handle incorrect input, e.g., show an error message
-            Debug.Log("Incorrect input. Try again.");
+            foreach (Word word in currentRecipe.steps[currentStepIndex].words)
+            {
+                if (word.GetNextLetter() == letter)
+                {
+                    activeWord = word;
+                    hasActiveWord = true;
+                    word.TypeLetter();
+                    break;
+                }
+            }
+        }
+
+        if (hasActiveWord && activeWord.WordTyped())
+        {
+            hasActiveWord = false;
+            activeWord = null;
         }
     }
 }
