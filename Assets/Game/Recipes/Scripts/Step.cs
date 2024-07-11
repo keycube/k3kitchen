@@ -4,5 +4,5 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Step", menuName = "Recipe/Step")]
 public class Step : ScriptableObject
 {
-    public List<Word> words;
+    public List<string> words;
 }

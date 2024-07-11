@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb1ad0fe126e6043adf39800e8537b8, type: 3}
+  m_Name: BurgerFries
+  m_EditorClassIdentifier: 
+  steps:
+  - {fileID: 11400000, guid: abf5842e1cbd66946b784b2d1ba08768, type: 2}
+  - {fileID: 11400000, guid: c00ef87fad0c80d4a90aa03d60934789, type: 2}
+  - {fileID: 11400000, guid: abb5c0bdfbbae954a8757407af2a9cff, type: 2}
+  - {fileID: 11400000, guid: d3b69a7afd79e3c44aacf280fe7a557c, type: 2}
+  - {fileID: 11400000, guid: 8d38c466f41aa0d438ffa641316c7d52, type: 2}
+  - {fileID: 11400000, guid: 3c1b0851468e3ae4b840bbfa7e206728, type: 2}
+  - {fileID: 11400000, guid: e88464c2fdce7a94f92de4f5f01878e6, type: 2}
+  - {fileID: 11400000, guid: 31215d031e852284db947f375d650777, type: 2}
+  - {fileID: 11400000, guid: 8156ae6a61b12c043a9039d644830b79, type: 2}
+  - {fileID: 11400000, guid: 285b34b6a77b4c4408bb1a18ad04f7be, type: 2}
+  - {fileID: 11400000, guid: d12d1a826ccc2e145843ba51ad346016, type: 2}
+  - {fileID: 11400000, guid: 885e20fee14e5b6419a0c8228d444efb, type: 2}
+  - {fileID: 11400000, guid: 9ae7e92f2987e014082edfbff6513945, type: 2}
+  - {fileID: 11400000, guid: 38541230c22301d498a3f1d5836a339f, type: 2}
+  - {fileID: 11400000, guid: 591152487e3fb27469cb930683fdc72d, type: 2}

@@ -2,63 +2,98 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class RecipeManager : MonoBehaviour
 {
-
     public Recipe[] recipes;
-
     public Recipe currentRecipe;
-    public TMP_Text displayText; // UI Text component to display the current word
-    public TMP_Text displayText2;
-
+    public TMP_Text displayText;
     public int currentStepIndex;
-
-    private int currentWordIndex;
-
-    private bool hasActiveWord;
-    private Word activeWord;
+    private int currentLetterIndex;
+    private string sentence;
+    private bool isRecipeCompleted;
 
     void Start()
     {
-        currentRecipe = recipes[0];
+        // Set the base color of the display text to black
+        displayText.color = Color.black;
+
+        SelectRandomRecipe();
+    }
+
+    private void SelectRandomRecipe()
+    {
+        int randomIndex = Random.Range(0, recipes.Length);
+        currentRecipe = recipes[randomIndex];
+        InitializeRecipe();
+    }
+
+    private void InitializeRecipe()
+    {
         currentStepIndex = 0;
-        currentWordIndex = 0;
-        hasActiveWord = false;
-        activeWord = null;
-            
-        displayText.text = currentRecipe.steps[currentStepIndex].words[currentWordIndex].word;
-        displayText2.text = currentRecipe.steps[currentStepIndex].words[currentWordIndex+1].word;
+        currentLetterIndex = 0;
+        sentence = "";
+        isRecipeCompleted = false;
+
+        if (currentRecipe.steps.Count > 0)
+        {
+            InitializeStep();
+        }
+    }
+
+    private void InitializeStep()
+    {
+        Debug.Log("Initializing step " + currentStepIndex);
+        sentence = "";
+
+        foreach (string word in currentRecipe.steps[currentStepIndex].words)
+        {
+            sentence += word + " ";
+        }
+
+        displayText.text = sentence;
+        currentLetterIndex = 0; // Reset the letter index for the new step
     }
 
     public void TypeLetter(char letter)
     {
-        if (hasActiveWord)
-        {
-            if (activeWord.GetNextLetter() == letter)
-            {
-                activeWord.TypeLetter();
-            }
-        }
-        else
-        {
-            foreach (Word word in currentRecipe.steps[currentStepIndex].words)
-            {
-                if (word.GetNextLetter() == letter)
-                {
-                    activeWord = word;
-                    hasActiveWord = true;
-                    word.TypeLetter();
-                    break;
-                }
-            }
-        }
+        if (isRecipeCompleted) return;
 
-        if (hasActiveWord && activeWord.WordTyped())
+        if (currentLetterIndex < sentence.Length && sentence[currentLetterIndex] == letter)
         {
-            hasActiveWord = false;
-            activeWord = null;
+            currentLetterIndex++;
+            Debug.Log("Correct letter");
+
+            // Update displayText to show typed letters with a different style (e.g., grey)
+            string typedPart = "<color=grey>" + sentence.Substring(0, currentLetterIndex) + "</color>";
+            string remainingPart = sentence.Substring(currentLetterIndex);
+            displayText.text = typedPart + remainingPart;
+
+            CheckStepCompletion();
+        }
+    }
+
+    private void CheckStepCompletion()
+    {
+        // Check if the entire sentence is typed
+        if (currentLetterIndex >= sentence.Length - 1) // -1 to account for the trailing space
+        {
+            Debug.Log("All words typed!");
+            currentStepIndex++;
+            if (currentStepIndex < currentRecipe.steps.Count)
+            {
+                InitializeStep();
+            }
+            else
+            {
+                // Handle recipe completion
+                Debug.Log("Recipe completed!");
+                displayText.text = "Recipe completed!";
+                isRecipeCompleted = true;
+
+                // Select a new random recipe
+                SelectRandomRecipe();
+            }
         }
     }
 }
