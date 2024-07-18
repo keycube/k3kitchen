@@ -8,17 +8,47 @@ public class RecipeManager : MonoBehaviour
     public Recipe[] recipes;
     public Recipe currentRecipe;
     public TMP_Text displayText;
+    public TMP_Text displayScore;
+    public TMP_Text displayStars;
+    public TMP_Text displayTimer;
+
+    public int score = 0;
+    public int stars = 3;
     public int currentStepIndex;
+
     private int currentLetterIndex;
     private string sentence;
     private bool isRecipeCompleted;
+    private float timeRemaining;
+    private bool timerRunning;
 
     void Start()
     {
         // Set the base color of the display text to black
         displayText.color = Color.black;
 
+        displayScore.text = "Score: " + score;
+        displayStars.text = "Stars: " + stars;
+
         SelectRandomRecipe();
+    }
+
+    private void Update()
+    {
+        if (timerRunning)
+        {
+            if (timeRemaining > 0)
+            {
+                timeRemaining -= Time.deltaTime;
+                displayTimer.text = "Time: " + Mathf.Round(timeRemaining).ToString();
+            }
+            else
+            {
+                timeRemaining = 0;
+                timerRunning = false;
+                LoseStar();
+            }
+        }
     }
 
     private void SelectRandomRecipe()
@@ -38,6 +68,7 @@ public class RecipeManager : MonoBehaviour
         if (currentRecipe.steps.Count > 0)
         {
             InitializeStep();
+            StartTimer();
         }
     }
 
@@ -91,9 +122,35 @@ public class RecipeManager : MonoBehaviour
                 displayText.text = "Recipe completed!";
                 isRecipeCompleted = true;
 
+                score += 2 * currentRecipe.steps.Count;
+                displayScore.text = "Score: " + score;
+
+                timerRunning = false;
+
                 // Select a new random recipe
                 SelectRandomRecipe();
             }
+        }
+    }
+
+    private void StartTimer()
+    {
+        timeRemaining = currentRecipe.timeLimit;
+        timerRunning = true;
+        displayTimer.text = "Time: " + Mathf.Round(timeRemaining).ToString();
+    }
+
+    private void LoseStar()
+    {
+        stars--;
+        displayStars.text = "Stars: " + stars;
+
+        if (stars <= 0)
+        {
+            // Handle game over
+            displayText.text = "Game Over";
+            timerRunning = false;
+            isRecipeCompleted = true;
         }
     }
 }
