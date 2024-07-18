@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb1ad0fe126e6043adf39800e8537b8, type: 3}
-  m_Name: Pasta
+  m_Script: {fileID: 11500000, guid: 3b4ca37b200b7224099efc7442728f2d, type: 3}
+  m_Name: SeasonFries
   m_EditorClassIdentifier: 
-  steps:
-  - {fileID: 11400000, guid: f06d0d4be9c8bb241a3fe243a40c290e, type: 2}
+  words:
+  - season
+  - fries

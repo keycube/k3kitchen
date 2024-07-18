@@ -2,72 +2,155 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class RecipeManager : MonoBehaviour
 {
+    public Recipe[] recipes;
     public Recipe currentRecipe;
-    public TMP_Text displayText; // UI Text component to display the current word
-    public TMP_InputField inputField; // UI InputField component to receive player's input
+    public TMP_Text displayText;
+    public TMP_Text displayScore;
+    public TMP_Text displayStars;
+    public TMP_Text displayTimer;
 
-    private int currentStepIndex;
-    private int currentWordIndex;
-    private bool isWordCompleted;
+    public int score = 0;
+    public int stars = 3;
+    public int currentStepIndex;
+
+    private int currentLetterIndex;
+    private string sentence;
+    private bool isRecipeCompleted;
+    private float timeRemaining;
+    private bool timerRunning;
 
     void Start()
     {
-        if (currentRecipe != null && displayText != null && inputField != null)
-        {
-            currentStepIndex = 0;
-            currentWordIndex = 0;
-            isWordCompleted = false;
-            inputField.onEndEdit.AddListener(OnWordEntered);
-            StartCoroutine(PlayRecipe());
-        }
+        // Set the base color of the display text to black
+        displayText.color = Color.black;
+
+        displayScore.text = "Score: " + score;
+        displayStars.text = "Stars: " + stars;
+
+        SelectRandomRecipe();
     }
 
-    IEnumerator PlayRecipe()
+    private void Update()
     {
-        while (currentStepIndex < currentRecipe.steps.Count)
+        if (timerRunning)
         {
-            Step currentStep = currentRecipe.steps[currentStepIndex];
-            while (currentWordIndex < currentStep.words.Count)
+            if (timeRemaining > 0)
             {
-                string currentWord = currentStep.words[currentWordIndex];
-                displayText.text = currentWord;
-                isWordCompleted = false;
-
-                // Wait until the player completes the current word
-                while (!isWordCompleted)
-                {
-                    yield return null;
-                }
-
-                currentWordIndex++;
+                timeRemaining -= Time.deltaTime;
+                displayTimer.text = "Time: " + Mathf.Round(timeRemaining).ToString();
             }
-            currentWordIndex = 0;
-            currentStepIndex++;
+            else
+            {
+                timeRemaining = 0;
+                timerRunning = false;
+                LoseStar();
+            }
         }
-
-        // Recipe completed
-        displayText.text = "Recipe completed!";
     }
 
-    void OnWordEntered(string playerInput)
+    private void SelectRandomRecipe()
     {
-        Step currentStep = currentRecipe.steps[currentStepIndex];
-        string currentWord = currentStep.words[currentWordIndex];
+        int randomIndex = Random.Range(0, recipes.Length);
+        currentRecipe = recipes[randomIndex];
+        InitializeRecipe();
+    }
 
-        if (playerInput.Trim().Equals(currentWord, System.StringComparison.OrdinalIgnoreCase))
+    private void InitializeRecipe()
+    {
+        currentStepIndex = 0;
+        currentLetterIndex = 0;
+        sentence = "";
+        isRecipeCompleted = false;
+
+        if (currentRecipe.steps.Count > 0)
         {
-            isWordCompleted = true;
-            inputField.text = string.Empty; // Clear input field for the next word
-            inputField.ActivateInputField(); // Keep the input field focused
+            InitializeStep();
+            StartTimer();
         }
-        else
+    }
+
+    private void InitializeStep()
+    {
+        Debug.Log("Initializing step " + currentStepIndex);
+        sentence = "";
+
+        foreach (string word in currentRecipe.steps[currentStepIndex].words)
         {
-            // Optionally handle incorrect input, e.g., show an error message
-            Debug.Log("Incorrect input. Try again.");
+            sentence += word + " ";
+        }
+
+        displayText.text = sentence;
+        currentLetterIndex = 0; // Reset the letter index for the new step
+    }
+
+    public void TypeLetter(char letter)
+    {
+        if (isRecipeCompleted) return;
+
+        if (currentLetterIndex < sentence.Length && sentence[currentLetterIndex] == letter)
+        {
+            currentLetterIndex++;
+            Debug.Log("Correct letter");
+
+            // Update displayText to show typed letters with a different style (e.g., grey)
+            string typedPart = "<color=grey>" + sentence.Substring(0, currentLetterIndex) + "</color>";
+            string remainingPart = sentence.Substring(currentLetterIndex);
+            displayText.text = typedPart + remainingPart;
+
+            CheckStepCompletion();
+        }
+    }
+
+    private void CheckStepCompletion()
+    {
+        // Check if the entire sentence is typed
+        if (currentLetterIndex >= sentence.Length - 1) // -1 to account for the trailing space
+        {
+            Debug.Log("All words typed!");
+            currentStepIndex++;
+            if (currentStepIndex < currentRecipe.steps.Count)
+            {
+                InitializeStep();
+            }
+            else
+            {
+                // Handle recipe completion
+                Debug.Log("Recipe completed!");
+                displayText.text = "Recipe completed!";
+                isRecipeCompleted = true;
+
+                score += 2 * currentRecipe.steps.Count;
+                displayScore.text = "Score: " + score;
+
+                timerRunning = false;
+
+                // Select a new random recipe
+                SelectRandomRecipe();
+            }
+        }
+    }
+
+    private void StartTimer()
+    {
+        timeRemaining = currentRecipe.timeLimit;
+        timerRunning = true;
+        displayTimer.text = "Time: " + Mathf.Round(timeRemaining).ToString();
+    }
+
+    private void LoseStar()
+    {
+        stars--;
+        displayStars.text = "Stars: " + stars;
+
+        if (stars <= 0)
+        {
+            // Handle game over
+            displayText.text = "Game Over";
+            timerRunning = false;
+            isRecipeCompleted = true;
         }
     }
 }
