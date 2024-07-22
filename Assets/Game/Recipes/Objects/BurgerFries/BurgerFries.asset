@@ -28,4 +28,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9ae7e92f2987e014082edfbff6513945, type: 2}
   - {fileID: 11400000, guid: 38541230c22301d498a3f1d5836a339f, type: 2}
   - {fileID: 11400000, guid: 591152487e3fb27469cb930683fdc72d, type: 2}
-  timeLimit: 10
+  timeLimit: 120
