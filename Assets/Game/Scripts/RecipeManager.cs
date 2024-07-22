@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RecipeManager : MonoBehaviour
 {
@@ -147,10 +148,7 @@ public class RecipeManager : MonoBehaviour
 
         if (stars <= 0)
         {
-            // Handle game over
-            displayText.text = "Game Over";
-            timerRunning = false;
-            isRecipeCompleted = true;
+            SceneManager.LoadScene("Endgame");
         }
     }
 }
