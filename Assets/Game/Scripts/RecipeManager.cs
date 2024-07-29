@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class RecipeManager : MonoBehaviour
 {
@@ -12,6 +12,8 @@ public class RecipeManager : MonoBehaviour
     public TMP_Text displayScore;
     public TMP_Text displayStars;
     public TMP_Text displayTimer;
+
+    public Image[] stepIndicators; // References to the UI Images for steps
 
     public int score = 0;
     public int stars = 3;
@@ -66,6 +68,8 @@ public class RecipeManager : MonoBehaviour
         sentence = "";
         isRecipeCompleted = false;
 
+        UpdateStepIndicators();
+
         if (currentRecipe.steps.Count > 0)
         {
             InitializeStep();
@@ -112,6 +116,8 @@ public class RecipeManager : MonoBehaviour
         {
             Debug.Log("All words typed!");
             currentStepIndex++;
+            UpdateStepIndicators(); // Update the step indicators
+
             if (currentStepIndex < currentRecipe.steps.Count)
             {
                 InitializeStep();
@@ -148,7 +154,26 @@ public class RecipeManager : MonoBehaviour
 
         if (stars <= 0)
         {
-            SceneManager.LoadScene("Endgame");
+            // Handle game over
+            displayText.text = "Game Over";
+            timerRunning = false;
+            isRecipeCompleted = true;
+        }
+    }
+
+    private void UpdateStepIndicators()
+    {
+        for (int i = 0; i < stepIndicators.Length; i++)
+        {
+            if (i < currentRecipe.steps.Count)
+            {
+                stepIndicators[i].gameObject.SetActive(true);
+                stepIndicators[i].color = (i < currentStepIndex) ? Color.grey : Color.black;
+            }
+            else
+            {
+                stepIndicators[i].gameObject.SetActive(false);
+            }
         }
     }
 }
